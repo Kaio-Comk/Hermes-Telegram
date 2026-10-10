@@ -1,0 +1,22 @@
+[project]
+name = "tgmediakit"
+version = "0.1.0"
+description = "Small helpers for Telegram media bots: parallel downloads, session pool, rate limit, safe logs"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+aiohttp = ["aiohttp>=3.9"]
+dev = ["pytest>=8", "aiohttp>=3.9"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["tgmediakit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
