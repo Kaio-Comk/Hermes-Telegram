@@ -1,12 +1,12 @@
 <div align="center">
 
-# ⚡ tgmediakit
+# ⚡ Hermes-Telegram (tgmediakit)
 ### Production-Grade Toolkit for High-Traffic Telegram Media Bots & MTProto Streaming
 
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg?logo=python&logoColor=white)](https://python.org)
-[![Telethon & Aiogram](https://img.shields.io/badge/Frameworks-Telethon%20%7C%20Aiogram%20%7C%20Aiohttp-blueviolet.svg)](https://github.com/Kaio-Comk/tgmediakit)
-[![Concurrency](https://img.shields.io/badge/Concurrency-Chunked%20Parallel%20MTProto-purple.svg)](https://github.com/Kaio-Comk/tgmediakit)
-[![Security: Zero-Leak](https://img.shields.io/badge/Security-Token%20Redaction%20%26%20Rate%20Limit-green.svg)](https://github.com/Kaio-Comk/tgmediakit)
+[![Telethon & Aiogram](https://img.shields.io/badge/Frameworks-Telethon%20%7C%20Aiogram%20%7C%20Aiohttp-blueviolet.svg)](https://github.com/Kaio-Comk/Hermes-Telegram)
+[![Concurrency](https://img.shields.io/badge/Concurrency-Chunked%20Parallel%20MTProto-purple.svg)](https://github.com/Kaio-Comk/Hermes-Telegram)
+[![Security: Zero-Leak](https://img.shields.io/badge/Security-Token%20Redaction%20%26%20Rate%20Limit-green.svg)](https://github.com/Kaio-Comk/Hermes-Telegram)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Battle-tested utilities for scaling Telegram bots handling gigabytes of media downloads.**  
@@ -51,7 +51,7 @@ flowchart TD
 ## 📦 Installation
 
 ```bash
-pip install git+https://github.com/Kaio-Comk/tgmediakit.git
+pip install git+https://github.com/Kaio-Comk/Hermes-Telegram.git
 
 # For aiohttp middleware & logging utilities:
 pip install "aiohttp>=3.9"
@@ -124,5 +124,5 @@ pytest -v
 Distributed under the **MIT License**. See `LICENSE` for details.
 
 <div align="center">
-  <sub>Built with ❤️ by Kaio Lima. If tgmediakit sped up your bot, please give it a ⭐!</sub>
+  <sub>Built with ❤️ by Kaio Lima. If Hermes-Telegram sped up your bot, please give it a ⭐!</sub>
 </div>
