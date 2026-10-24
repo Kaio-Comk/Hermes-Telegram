@@ -1,7 +1,7 @@
 <div align="center">
 
 # ⚡ Hermes-Telegram (tgmediakit)
-### Production-Grade Toolkit for High-Traffic Telegram Media Bots & MTProto Streaming
+### Resilient Toolkit for High-Throughput Telegram Media Bots & MTProto Streaming
 
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg?logo=python&logoColor=white)](https://python.org)
 [![Telethon & Aiogram](https://img.shields.io/badge/Frameworks-Telethon%20%7C%20Aiogram%20%7C%20Aiohttp-blueviolet.svg)](https://github.com/Kaio-Comk/Hermes-Telegram)
@@ -9,7 +9,7 @@
 [![Security: Zero-Leak](https://img.shields.io/badge/Security-Token%20Redaction%20%26%20Rate%20Limit-green.svg)](https://github.com/Kaio-Comk/Hermes-Telegram)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Battle-tested utilities for scaling Telegram bots handling gigabytes of media downloads.**  
+**Modular, verified utilities for scaling Telegram bots handling high-volume MTProto streaming.**  
 *Multi-part parallel MTProto streaming, multi-session client pooling with FloodWait penalties, sliding-window rate limiters, and token-safe logging.*
 
 [Modules](#-module-overview) • [How It Works](#-architecture) • [Installation](#-installation) • [Examples](#-module-walkthrough--examples) • [Contributing](#-contributing)
@@ -115,6 +115,21 @@ logging.getLogger().addHandler(handler)
 ```bash
 pip install -e ".[dev]"
 pytest -v
+```
+
+---
+
+---
+
+## 🧪 Automated Testing & Simulation
+
+The library includes automated tests covering edge conditions and network anomalies:
+* **FloodWait Penalty Scheduling (`tests/test_pool.py`):** Simulates Telegram FloodWait rate-limit penalties, ensuring penalized sessions are temporarily excluded from worker rotation and seamlessly restored once the timeout expires.
+* **Reverse-Proxy Client IP Extraction (`tests/test_ratelimit.py`):** Verifies Cloudflare reverse-proxy header order, proving that spoofed client-supplied `X-Forwarded-For` headers are discarded in favor of verified edge IPs.
+* **Credential Log Scrubbing (`tests/test_logsafe.py`):** Validates regex redaction filters for Telegram bot tokens (`123456:ABC-DEF...`), authorization bearer tokens, and phone numbers.
+
+```bash
+pytest tests/ -v
 ```
 
 ---
