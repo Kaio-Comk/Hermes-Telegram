@@ -46,3 +46,29 @@ def test_arquivo_pequeno_usa_o_caminho_simples(tmp_path):
     c = FakeClient(data)
     asyncio.run(download_parallel(c, _msg(len(data)), tmp_path / "z", connections=4))
     assert c.fallback_used
+
+
+class ClienteLento(FakeClient):
+    async def iter_download(self, doc, offset, request_size, limit):
+        await asyncio.sleep(0.05)
+        yield self.data[offset:offset + request_size]
+
+
+def test_cancelar_nao_deixa_tarefas_orfas(tmp_path):
+    # O player fecha no meio do download: as tarefas de cada conexão precisam parar junto.
+    # Antes, CancelledError (que não herda de Exception) passava reto e elas ficavam vivas.
+    data = os.urandom(BLOCK * 40)
+    c = ClienteLento(data)
+
+    async def cenario():
+        t = asyncio.create_task(download_parallel(c, _msg(len(data)), tmp_path / "z.mp4", connections=4))
+        await asyncio.sleep(0.12)
+        t.cancel()
+        try:
+            await t
+        except asyncio.CancelledError:
+            pass
+        await asyncio.sleep(0)
+        return [x for x in asyncio.all_tasks() if x is not asyncio.current_task()]
+
+    assert asyncio.run(cenario()) == []

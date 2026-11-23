@@ -85,6 +85,13 @@ async def download_parallel(client, msg, dest: Path, progress_cb=None, *,
         written = dest.stat().st_size
         if written != total:
             raise IOError(f"final size {written} != expected {total}")
+    except asyncio.CancelledError:
+        # The caller gave up (player closed): stop every track too. CancelledError is not an
+        # Exception, so before 04/11/2026 it skipped the cleanup below and the tracks kept running.
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        raise
     except Exception as e:  # noqa: BLE001 - any failure falls back to the classic path
         for task in tasks:
             task.cancel()

@@ -3,7 +3,7 @@
 # ⚡ Hermes-Telegram (tgmediakit)
 ### Resilient Toolkit for High-Throughput Telegram Media Bots & MTProto Streaming
 
-[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg?logo=python&logoColor=white)](https://python.org)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://python.org)
 [![Telethon & Aiogram](https://img.shields.io/badge/Frameworks-Telethon%20%7C%20Aiogram%20%7C%20Aiohttp-blueviolet.svg)](https://github.com/Kaio-Comk/Hermes-Telegram)
 [![Concurrency](https://img.shields.io/badge/Concurrency-Chunked%20Parallel%20MTProto-purple.svg)](https://github.com/Kaio-Comk/Hermes-Telegram)
 [![Security: Zero-Leak](https://img.shields.io/badge/Security-Token%20Redaction%20%26%20Rate%20Limit-green.svg)](https://github.com/Kaio-Comk/Hermes-Telegram)

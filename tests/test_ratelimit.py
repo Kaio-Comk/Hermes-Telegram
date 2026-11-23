@@ -94,3 +94,25 @@ def test_middleware_aplica_o_limite_mesmo_com_xff_forjado():
         return codigos
 
     assert asyncio.run(go()) == [200, 200, 429, 429]
+
+
+def test_ipv6_do_mesmo_64_divide_o_balde():
+    # Quem tem um /64 controla 2^64 endereços: trocar o final do IPv6 não pode zerar o limite.
+    from tgmediakit.ratelimit import chave_de_rede
+    assert chave_de_rede("2001:db8:1:2::1") == chave_de_rede("2001:db8:1:2:ffff::9")
+    assert chave_de_rede("2001:db8:1:2::1") != chave_de_rede("2001:db8:1:3::1")
+    assert chave_de_rede("203.0.113.7") == "203.0.113.7"
+    assert chave_de_rede("lixo") == "lixo"
+    rl = RateLimiter(por_minuto=2)
+    ips = [f"2001:db8:1:2::{i:x}" for i in range(1, 6)]
+    assert [rl.permitir(chave_de_rede(ip)) for ip in ips] == [True, True, False, False, False]
+
+
+def test_teto_de_baldes_contra_inundacao():
+    import time
+    rl = RateLimiter(por_minuto=5, janela_s=0.1, max_chaves=3)
+    assert all(rl.permitir(k) for k in ("a", "b", "c"))
+    assert rl.permitir("d") is False                 # cheio e nada vencido: chave nova recusada
+    assert rl.permitir("a") is True                  # quem já está no balde continua sendo atendido
+    time.sleep(0.15)
+    assert rl.permitir("d") is True and len(rl._hits) <= 3

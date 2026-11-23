@@ -7,19 +7,35 @@ local calls with no proxy header (health checks, curl) skip the limiter
 """
 from __future__ import annotations
 
+import ipaddress
 import time
 from collections import defaultdict, deque
 
 _GC_INTERVALO_S = 300  # varre baldes vazios a cada 5 min (senão o dict só cresce)
 
 
+def chave_de_rede(ip: str) -> str:
+    """Chave do balde: o IPv4 inteiro, ou a REDE /64 do IPv6. Quem tem um /64 controla 2^64
+    endereços; por endereço, bastava trocar o final a cada requisição para nunca bater no limite."""
+    try:
+        addr = ipaddress.ip_address(str(ip).strip())
+    except ValueError:
+        return ip
+    if addr.version == 6:
+        if addr.ipv4_mapped is not None:          # ::ffff:203.0.113.7 é o mesmo cliente IPv4
+            return str(addr.ipv4_mapped)
+        return str(ipaddress.ip_network(f"{addr}/64", strict=False))
+    return str(addr)
+
+
 class RateLimiter:
     """Janela deslizante por chave (IP). Um deque de timestamps por chave;
-    memória limitada a `limite` floats por IP ativo + GC periódico."""
+    memória limitada a `limite` floats por IP ativo + GC periódico + teto de chaves."""
 
-    def __init__(self, por_minuto: int = 60, janela_s: float = 60.0):
+    def __init__(self, por_minuto: int = 60, janela_s: float = 60.0, max_chaves: int = 100_000):
         self.limite = int(por_minuto)
         self.janela = float(janela_s)
+        self.max_chaves = int(max_chaves)
         self._hits: dict[str, deque[float]] = defaultdict(deque)
         self._ultimo_gc = time.monotonic()
 
@@ -27,6 +43,13 @@ class RateLimiter:
         """True se a requisição cabe na janela; False = responder 429."""
         agora = time.monotonic()
         corte = agora - self.janela
+        if chave not in self._hits and len(self._hits) >= self.max_chaves:
+            # Inundação de chaves novas (ex.: IPs rotativos): limpa o que venceu; se continuar cheio,
+            # recusa a chave nova em vez de deixar a memória crescer sem limite até o próximo GC.
+            self._gc(corte)
+            self._ultimo_gc = agora
+            if len(self._hits) >= self.max_chaves:
+                return False
         dq = self._hits[chave]
         while dq and dq[0] <= corte:
             dq.popleft()
@@ -89,7 +112,7 @@ def aiohttp_middleware(limiter: RateLimiter, isentos: tuple[str, ...] = ()):
             return await handler(request)
         if chamada_interna(request.headers, request.remote):
             return await handler(request)
-        if not limiter.permitir(ip_real(request.headers, request.remote)):
+        if not limiter.permitir(chave_de_rede(ip_real(request.headers, request.remote))):
             return web.json_response({"detail": "Too Many Requests"},
                                      status=429, headers={"Retry-After": "30"})
         return await handler(request)
